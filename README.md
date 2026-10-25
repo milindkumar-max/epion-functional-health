@@ -55,25 +55,23 @@ GEMINI_API_KEY="AIzaSy..."
 
 The local git repository has been initialized with the `main` branch. To push this repository to your GitHub account:
 
-### Step 1: Create a New Repository on GitHub
-1. Go to [https://github.com/new](https://github.com/new).
-2. Enter repository name: `epion-functional-health` (or your preferred name).
-3. Choose **Private** or **Public**.
-4. **Do not** initialize with a README, .gitignore, or license (they are already included here).
-5. Click **Create repository**.
+### Push to GitHub (`milindkumar-max/epion-functional-health`)
+The remote origin is configured as:
+`https://github.com/milindkumar-max/epion-functional-health.git`
 
-### Step 2: Push from Terminal
-Run the following commands in this directory:
+To push the commits from your local environment or terminal:
 
 ```bash
-# Add your GitHub repository as origin
-git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/epion-functional-health.git
-
-# Set main branch and push
-git branch -M main
+# Push directly to main branch
 git push -u origin main
 ```
-*(If prompted for password on GitHub, use your GitHub Personal Access Token with `repo` scope).*
+
+*(Note: When prompted for your GitHub password, provide a **GitHub Personal Access Token (classic or fine-grained)** with `repo` scope permissions, as GitHub does not accept account passwords for command-line Git operations).*
+
+Alternatively, if pushing directly with a token:
+```bash
+git push https://<YOUR_GITHUB_TOKEN>@github.com/milindkumar-max/epion-functional-health.git main
+```
 
 ---
 
