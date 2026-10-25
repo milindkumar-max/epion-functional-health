@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Calendar, Clock, User, Check, X, RefreshCw, AlertCircle, Ban } from 'lucide-react';
+import { ShieldCheck, Calendar, Clock, User, Check, X, RefreshCw, AlertCircle, Ban, Utensils, Pill, Sparkles, Send } from 'lucide-react';
 
 interface AdminDashboardProps {
   onClose: () => void;
@@ -19,6 +19,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
 
   const [newBlockedDate, setNewBlockedDate] = useState<string>('');
   const [actionMessage, setActionMessage] = useState<string>('');
+
+  // Care Plan Prescriber Modal State
+  const [editingCarePlanBooking, setEditingCarePlanBooking] = useState<any | null>(null);
+  const [isSavingPlan, setIsSavingPlan] = useState<boolean>(false);
+  const [planFormData, setPlanFormData] = useState({
+    title: 'Individualized Gut-Barrier & Metabolic Care Protocol',
+    clinicalFocus: 'Epithelial Stabilization & Postprandial Glycemic Damping',
+    dailyCalorieTarget: '1,850 kcal baseline',
+    macroProtein: '95g (1.4g/kg target for lean repair)',
+    macroFiber: '35g+ daily prebiotic diversity',
+    macroFats: '75g extra virgin olive oil, avocado, wild lipids',
+    macroCarbs: '160g low-glycemic slow carbs',
+    breakfast: 'Pasture eggs scrambled with spinach & mushrooms, avocado, sprouted sourdough',
+    lunch: 'Rainbow cruciferous slaw with wild salmon or organic tempeh and resistant starch black rice',
+    dinner: 'Mineral-rich bone or shiitake broth with steamed zucchini, sweet potato, and fresh turmeric',
+    prioritize: 'Polyphenol berries, cold-pressed olive oil, fermented vegetables, dark leafy greens, ginger',
+    avoid: 'Refined seed oils, commercial wheat flour, ultra-processed emulsifiers, artificial sweeteners',
+    supplements: 'Magnesium Glycinate (300mg before sleep)\nZinc Carnosine (37.5mg on empty stomach)\nUltra-Pure Omega-3 (2,000mg with lunch)\nSoil-Based Spore Probiotic (1 capsule with dinner)',
+    practitionerNotes: 'Follow the protocol diligently for 4 weeks. Record daily energy, digestion, and sleep scores. A follow-up consultation is scheduled to review biomarker adjustments.',
+    nextFollowUp: 'Scheduled in 4 weeks',
+  });
 
   const loadData = () => {
     setIsLoading(true);
@@ -84,6 +105,106 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
     });
     setActionMessage(`Date ${d} unblocked.`);
     loadData();
+  };
+
+  const handleOpenCarePlanModal = (b: any) => {
+    setEditingCarePlanBooking(b);
+    setPlanFormData((prev) => ({
+      ...prev,
+      title: `${b.fullName}'s Personalized Functional Nutrition Protocol`,
+      clinicalFocus: b.reason ? `Targeted Care for: ${b.reason}` : prev.clinicalFocus,
+    }));
+  };
+
+  const handleSaveCarePlan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCarePlanBooking) return;
+    setIsSavingPlan(true);
+
+    try {
+      const payload = {
+        userEmail: editingCarePlanBooking.email,
+        userId: editingCarePlanBooking.userId || '',
+        patientName: editingCarePlanBooking.fullName,
+        title: planFormData.title,
+        clinicalFocus: planFormData.clinicalFocus,
+        dailyCalorieTarget: planFormData.dailyCalorieTarget,
+        macroTargets: {
+          protein: planFormData.macroProtein,
+          fiber: planFormData.macroFiber,
+          healthyFats: planFormData.macroFats,
+          complexCarbs: planFormData.macroCarbs,
+        },
+        mealPlan: [
+          {
+            meal: 'Digestive Awakening & Morning Primer',
+            timing: '07:30 - 08:00 AM',
+            dishes: ['Warm water with 1 tbsp raw apple cider vinegar & sea salt', 'Fresh ginger root infusion'],
+            clinicalRationale: 'Vagal stimulation and gastric acid priming prior to first solid nutrients.',
+          },
+          {
+            meal: 'Nutrient-Dense Breakfast',
+            timing: '08:45 - 09:15 AM',
+            dishes: [planFormData.breakfast],
+            clinicalRationale: 'Protein and essential lipids stabilize early-morning blood glucose and cortisol.',
+          },
+          {
+            meal: 'Midday Systemic Fuel',
+            timing: '01:00 - 01:45 PM',
+            dishes: [planFormData.lunch],
+            clinicalRationale: 'Polyphenols and sulfur amino acids support Phase II liver clearance.',
+          },
+          {
+            meal: 'Circadian Evening Nourishment',
+            timing: '07:30 - 08:15 PM',
+            dishes: [planFormData.dinner],
+            clinicalRationale: 'Supports migrating motor complex (MMC) cleansing during overnight sleep.',
+          },
+        ],
+        foodsToPrioritize: planFormData.prioritize.split(',').map((s: string) => s.trim()).filter(Boolean),
+        foodsToAvoid: planFormData.avoid.split(',').map((s: string) => s.trim()).filter(Boolean),
+        supplements: planFormData.supplements.split('\n').filter(Boolean).map((line: string) => {
+          const match = line.match(/^(.*?)\s*\((.*?)\)\s*(.*)$/);
+          if (match) {
+            return {
+              name: match[1].trim(),
+              dosage: match[2].trim(),
+              timing: match[3].trim() || 'Daily with food',
+              purpose: 'Biochemical cellular pathway support',
+            };
+          }
+          return {
+            name: line.trim(),
+            dosage: 'Standard therapeutic dose',
+            timing: 'With main meal',
+            purpose: 'Biochemical cellular pathway support',
+          };
+        }),
+        lifestyleProtocols: [
+          'Post-meal movement: 10-15 min easy stroll after lunch and dinner.',
+          'Circadian cutoff: finish meals minimum 3 hours before sleep.',
+          'Hydration spacing: drink pure water between meals rather than large icy drinks with meals.',
+        ],
+        practitionerNotes: planFormData.practitionerNotes,
+        nextFollowUp: planFormData.nextFollowUp,
+        dateAssigned: new Date().toISOString().split('T')[0],
+      };
+
+      const res = await fetch('/api/careplans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error('Failed to save care plan.');
+
+      setActionMessage(`Personalized Care Plan successfully published for ${editingCarePlanBooking.fullName} (${editingCarePlanBooking.email}).`);
+      setEditingCarePlanBooking(null);
+    } catch (err: any) {
+      alert(err.message || 'Error saving care plan');
+    } finally {
+      setIsSavingPlan(false);
+    }
   };
 
   const filteredBookings = filterStatus === 'all'
@@ -247,6 +368,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                         </span>
                       </td>
                       <td className="py-3 px-3 text-right space-x-1 whitespace-nowrap">
+                        <button
+                          onClick={() => handleOpenCarePlanModal(b)}
+                          className="px-2 py-1 text-[10px] bg-[#163324] hover:bg-[#204532] text-white rounded font-medium inline-flex items-center gap-1 cursor-pointer"
+                          title="Prescribe or Edit Care Plan for this Patient"
+                        >
+                          <Utensils className="w-2.5 h-2.5" />
+                          <span>Plan</span>
+                        </button>
                         {b.status !== 'completed' && (
                           <button
                             onClick={() => handleUpdateStatus(b.id, 'completed')}
@@ -346,6 +475,225 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
             </p>
           </div>
         </div>
+
+        {/* Modal: Prescribe / Customize Care Plan for Patient */}
+        {editingCarePlanBooking && (
+          <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-in fade-in">
+            <div className="bg-[#FAF8F5] border border-[#DDD7CD] rounded-2xl max-w-3xl w-full p-6 sm:p-8 max-h-[85vh] overflow-y-auto shadow-2xl space-y-6">
+              
+              <div className="flex items-center justify-between pb-4 border-b border-[#E8E2D8]">
+                <div className="flex items-center gap-2">
+                  <Utensils className="w-5 h-5 text-[#163324]" />
+                  <div>
+                    <h3 className="font-serif text-xl font-semibold text-[#163324]">
+                      Prescribe Patient Care & Meal Plan
+                    </h3>
+                    <p className="text-xs text-[#5F7065]">
+                      Client: <strong>{editingCarePlanBooking.fullName}</strong> ({editingCarePlanBooking.email})
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setEditingCarePlanBooking(null)}
+                  className="p-1.5 text-[#5F7065] hover:text-[#163324] cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveCarePlan} className="space-y-4 text-xs">
+                <div>
+                  <label className="font-semibold text-[#163324] block mb-1">
+                    Protocol Title
+                  </label>
+                  <input
+                    type="text"
+                    value={planFormData.title}
+                    onChange={(e) => setPlanFormData({ ...planFormData, title: e.target.value })}
+                    className="w-full p-2.5 bg-white border border-[#DDD7CD] rounded font-medium text-[#163324]"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold text-[#163324] block mb-1">
+                      Clinical Focus Area
+                    </label>
+                    <input
+                      type="text"
+                      value={planFormData.clinicalFocus}
+                      onChange={(e) => setPlanFormData({ ...planFormData, clinicalFocus: e.target.value })}
+                      className="w-full p-2.5 bg-white border border-[#DDD7CD] rounded text-[#163324]"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold text-[#163324] block mb-1">
+                      Calorie Baseline Target
+                    </label>
+                    <input
+                      type="text"
+                      value={planFormData.dailyCalorieTarget}
+                      onChange={(e) => setPlanFormData({ ...planFormData, dailyCalorieTarget: e.target.value })}
+                      className="w-full p-2.5 bg-white border border-[#DDD7CD] rounded text-[#163324]"
+                    />
+                  </div>
+                </div>
+
+                {/* Macronutrient Architecture */}
+                <div className="p-3 bg-white border border-[#DDD7CD] rounded space-y-2">
+                  <span className="font-semibold text-[#163324] block text-[11px] uppercase tracking-wider">
+                    Macronutrient & Fiber Targets
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                    <div>
+                      <span className="text-[#5F7065] block">Protein</span>
+                      <input
+                        type="text"
+                        value={planFormData.macroProtein}
+                        onChange={(e) => setPlanFormData({ ...planFormData, macroProtein: e.target.value })}
+                        className="w-full p-1.5 border border-[#E8E2D8] rounded font-mono"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-[#5F7065] block">Prebiotic Fiber</span>
+                      <input
+                        type="text"
+                        value={planFormData.macroFiber}
+                        onChange={(e) => setPlanFormData({ ...planFormData, macroFiber: e.target.value })}
+                        className="w-full p-1.5 border border-[#E8E2D8] rounded font-mono"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-[#5F7065] block">Lipids / Fats</span>
+                      <input
+                        type="text"
+                        value={planFormData.macroFats}
+                        onChange={(e) => setPlanFormData({ ...planFormData, macroFats: e.target.value })}
+                        className="w-full p-1.5 border border-[#E8E2D8] rounded font-mono"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-[#5F7065] block">Complex Carbs</span>
+                      <input
+                        type="text"
+                        value={planFormData.macroCarbs}
+                        onChange={(e) => setPlanFormData({ ...planFormData, macroCarbs: e.target.value })}
+                        className="w-full p-1.5 border border-[#E8E2D8] rounded font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Meals */}
+                <div className="space-y-2">
+                  <span className="font-semibold text-[#163324] block text-[11px] uppercase tracking-wider">
+                    Prescribed Daily Meals
+                  </span>
+                  <div>
+                    <label className="text-[#5F7065] block mb-0.5">Breakfast</label>
+                    <input
+                      type="text"
+                      value={planFormData.breakfast}
+                      onChange={(e) => setPlanFormData({ ...planFormData, breakfast: e.target.value })}
+                      className="w-full p-2 bg-white border border-[#DDD7CD] rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[#5F7065] block mb-0.5">Lunch</label>
+                    <input
+                      type="text"
+                      value={planFormData.lunch}
+                      onChange={(e) => setPlanFormData({ ...planFormData, lunch: e.target.value })}
+                      className="w-full p-2 bg-white border border-[#DDD7CD] rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[#5F7065] block mb-0.5">Dinner</label>
+                    <input
+                      type="text"
+                      value={planFormData.dinner}
+                      onChange={(e) => setPlanFormData({ ...planFormData, dinner: e.target.value })}
+                      className="w-full p-2 bg-white border border-[#DDD7CD] rounded"
+                    />
+                  </div>
+                </div>
+
+                {/* Foods Prioritize / Avoid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold text-emerald-900 block mb-1">
+                      Foods to Prioritize (comma separated)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={planFormData.prioritize}
+                      onChange={(e) => setPlanFormData({ ...planFormData, prioritize: e.target.value })}
+                      className="w-full p-2 bg-white border border-emerald-200 rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold text-amber-900 block mb-1">
+                      Foods to Avoid / Phase-Out (comma separated)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={planFormData.avoid}
+                      onChange={(e) => setPlanFormData({ ...planFormData, avoid: e.target.value })}
+                      className="w-full p-2 bg-white border border-amber-200 rounded"
+                    />
+                  </div>
+                </div>
+
+                {/* Supplements */}
+                <div>
+                  <label className="font-semibold text-[#163324] block mb-1">
+                    Targeted Nutraceutical Supplements (One per line: Name (Dose) Timing)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={planFormData.supplements}
+                    onChange={(e) => setPlanFormData({ ...planFormData, supplements: e.target.value })}
+                    className="w-full p-2 bg-white border border-[#DDD7CD] rounded font-mono text-[11px]"
+                  />
+                </div>
+
+                {/* Practitioner Notes */}
+                <div>
+                  <label className="font-semibold text-[#163324] block mb-1">
+                    Practitioner Clinical Narrative & Instructions
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={planFormData.practitionerNotes}
+                    onChange={(e) => setPlanFormData({ ...planFormData, practitionerNotes: e.target.value })}
+                    className="w-full p-2 bg-white border border-[#DDD7CD] rounded"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E8E2D8]">
+                  <button
+                    type="button"
+                    onClick={() => setEditingCarePlanBooking(null)}
+                    className="px-4 py-2 border border-[#DDD7CD] rounded text-[#5F7065] hover:bg-gray-100 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingPlan}
+                    className="px-5 py-2 bg-[#163324] hover:bg-[#204532] text-white rounded font-semibold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>{isSavingPlan ? 'Publishing...' : 'Publish to Patient Portal'}</span>
+                  </button>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

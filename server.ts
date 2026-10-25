@@ -26,6 +26,7 @@ if (!fs.existsSync(DATA_DIR)) {
 
 const BOOKINGS_FILE = path.join(DATA_DIR, 'bookings.json');
 const CONFIG_FILE = path.join(DATA_DIR, 'config.json');
+const CAREPLANS_FILE = path.join(DATA_DIR, 'careplans.json');
 
 // Initialize Gemini Client
 const apiKey = process.env.GEMINI_API_KEY;
@@ -133,6 +134,134 @@ function loadBookings() {
 
 function saveBookings(bookings: any[]) {
   fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(bookings, null, 2));
+}
+
+// Initial Seed Care Plans & Meal Protocols
+const INITIAL_CAREPLANS = [
+  {
+    id: 'CP-892101',
+    userEmail: 'clara.hughes@example.com',
+    userId: '',
+    patientName: 'Clara Hughes',
+    title: 'Gut-Barrier Regeneration & Metabolic Insulin Protocol',
+    practitioner: 'Milind Kumar, Functional Nutritionist',
+    dateAssigned: '2026-10-18',
+    clinicalFocus: 'Epithelial Permeability Stabilization & Postprandial Glycemic Damping',
+    dailyCalorieTarget: '1,850 kcal (Nutrient-dense baseline)',
+    macroTargets: {
+      protein: '95g (1.4g/kg target for lean tissue & mucosal repair)',
+      fiber: '35g+ (Prebiotic diversities: acacia, artichoke, legumes)',
+      healthyFats: '75g (EVOO polyphenols, avocado, wild-caught omega-3)',
+      complexCarbs: '170g (Low-glycemic slow starches, cooling cooked tubers)',
+    },
+    mealPlan: [
+      {
+        meal: 'Morning Digestive Primer',
+        timing: '07:30 - 08:00 AM',
+        dishes: [
+          '300ml warm water with 1 tbsp raw unfiltered apple cider vinegar and a pinch of Celtic sea salt',
+          'Fresh ginger root & tulsi infusion (steeped 10 mins)',
+        ],
+        clinicalRationale: 'Stimulates vagal tone and gastric parietal acid secretion prior to first solid food intake.',
+      },
+      {
+        meal: 'Nutrient-Dense Breakfast',
+        timing: '08:45 - 09:15 AM',
+        dishes: [
+          'Pastured eggs (2 eggs + 1 white) scrambled in grass-fed ghee with baby spinach and mushrooms',
+          '1/2 ripe avocado sliced with toasted pumpkin seeds and sumac',
+          '1 slice sprouted ancient grain sourdough (fermented 24h)',
+        ],
+        clinicalRationale: 'High-protein and essential choline anchor blood glucose and sustain dopamine for morning cognition.',
+      },
+      {
+        meal: 'Midday Systemic Fuel',
+        timing: '01:00 - 01:45 PM',
+        dishes: [
+          'Grilled wild salmon or herb-marinated paneer/tempeh bowl',
+          'Rainbow cruciferous slaw: purple cabbage, grated carrots, radish with extra virgin olive oil and lemon',
+          'Small portion (1/2 cup) of cooled and reheated black rice (resistant starch)',
+        ],
+        clinicalRationale: 'Cruciferous sulforaphane supports Phase II liver biotransformation; resistant starch feeds Akkermansia muciniphila.',
+      },
+      {
+        meal: 'Circadian Evening Nourishment',
+        timing: '07:30 - 08:15 PM',
+        dishes: [
+          'Slow-simmered bone broth or mineral-rich seaweed-shiitake broth with bok choy',
+          'Roasted sweet potato & zucchini tossed with cold-pressed mustard oil, turmeric, and cracked black pepper',
+          'Steamed cod or mung-dal khichdi prepared with cumin and hing',
+        ],
+        clinicalRationale: 'Early dinner allows minimum 12-hour circadian gut resting window; glycine in broth aids nocturnal restorative sleep.',
+      },
+    ],
+    foodsToPrioritize: [
+      'Polyphenol-dense vegetables (dark berries, pomegranate, bitter greens, radicchio)',
+      'Prebiotic roots (jerusalem artichoke, leeks, garlic, onions, chicory)',
+      'Cold-pressed single-estate extra virgin olive oil (rich in oleocanthal)',
+      'Wild small oily fish (sardines, mackerel) or organic cold-pressed flaxseed',
+      'Naturally fermented foods: live active kimchi, raw sauerkraut (1-2 tbsp daily)',
+    ],
+    foodsToAvoid: [
+      'Refined seed oils (soybean, cottonseed, corn, industrial canola)',
+      'Ultra-processed emulsifiers (polysorbate-80, carboxymethylcellulose)',
+      'Artificial sweeteners (sucralose, acesulfame-K, aspartame)',
+      'Refined industrial wheat flour and added fructose syrups',
+      'Heavy dairy or commercial flavored yogurts with gums',
+    ],
+    supplements: [
+      {
+        name: 'Magnesium Glycinate / Malate Chelate',
+        dosage: '300mg elemental',
+        timing: '45 minutes before sleep',
+        purpose: 'Neuromuscular relaxation and hepatic detox cofactor',
+      },
+      {
+        name: 'Buffered L-Glutamine & Zinc Carnosine',
+        dosage: '5g L-Glutamine + 37.5mg Zinc Carnosine',
+        timing: 'First thing in morning on empty stomach',
+        purpose: 'Epithelial tight-junction repair and mucosal barrier defense',
+      },
+      {
+        name: 'Ultra-Pure Omega-3 EPA/DHA',
+        dosage: '2,000mg (1,200mg EPA / 600mg DHA)',
+        timing: 'With lunch',
+        purpose: 'Resolution of systemic mucosal inflammatory cascades',
+      },
+      {
+        name: 'Spore-Based Soil Probiotic (Bacillus coagulans/subtilis)',
+        dosage: '1 capsule (4 Billion CFU)',
+        timing: 'With largest meal of the day',
+        purpose: 'Gastric acid-resistant colonization and butyrate modulation',
+      },
+    ],
+    lifestyleProtocols: [
+      'Post-prandial movement: 10-15 minute gentle outdoor walk immediately following lunch and dinner.',
+      'Circadian eating window: Finish all caloric intake by 8:15 PM to ensure a 12-14 hour overnight gut motility phase (Migrating Motor Complex).',
+      'Mindful mastication: Chew each solid mouthful at least 25-30 times in an unhurried, parasympathetic state.',
+      'Hydration architecture: Hydrate between meals; avoid drinking large volumes of ice-cold water during digestion.',
+    ],
+    practitionerNotes: 'Reviewed recent lipid panel and comprehensive metabolic markers. Mild elevated fasting insulin (12.4 uIU/mL) and elevated hs-CRP (2.1 mg/L) suggest low-grade cellular inflammation. Primary focus over the next 4 weeks is epithelial stabilization and postprandial glucose stability. Avoid all unverified NSAIDs. Follow-up consultation scheduled to review symptomatic scores and bio-feedback markers.',
+    nextFollowUp: 'November 15, 2026',
+    createdAt: '2026-10-18T10:00:00.000Z',
+  },
+];
+
+function loadCarePlans() {
+  try {
+    if (fs.existsSync(CAREPLANS_FILE)) {
+      const data = fs.readFileSync(CAREPLANS_FILE, 'utf-8');
+      return JSON.parse(data);
+    }
+  } catch (e) {
+    console.error('Error loading care plans file:', e);
+  }
+  fs.writeFileSync(CAREPLANS_FILE, JSON.stringify(INITIAL_CAREPLANS, null, 2));
+  return INITIAL_CAREPLANS;
+}
+
+function saveCarePlans(plans: any[]) {
+  fs.writeFileSync(CAREPLANS_FILE, JSON.stringify(plans, null, 2));
 }
 
 function loadConfig() {
@@ -474,6 +603,173 @@ app.post('/api/admin/settings', (req, res) => {
 
   saveConfig(config);
   res.json({ message: 'Configuration saved.', config });
+});
+
+// 7b. Patient Portal: Fetch User Appointments (by Email or User ID)
+app.get('/api/user/appointments', (req, res) => {
+  const email = ((req.query.email as string) || '').toLowerCase().trim();
+  const userId = (req.query.userId as string) || '';
+
+  if (!email && !userId) {
+    return res.status(400).json({ error: 'Email or userId parameter is required.' });
+  }
+
+  const allBookings = loadBookings();
+  const matched = allBookings.filter((b: any) => {
+    const matchEmail = email && b.email && b.email.toLowerCase().trim() === email;
+    const matchUser = userId && b.userId && b.userId === userId;
+    return matchEmail || matchUser;
+  });
+
+  return res.json({ appointments: matched });
+});
+
+// 7c. Patient Portal: Care Plans & Meal Plans
+app.get('/api/careplans', (req, res) => {
+  const email = ((req.query.email as string) || '').toLowerCase().trim();
+  const userId = (req.query.userId as string) || '';
+
+  const allPlans = loadCarePlans();
+
+  if (!email && !userId) {
+    // Admin request or all plans
+    return res.json({ carePlans: allPlans });
+  }
+
+  const matched = allPlans.filter((p: any) => {
+    const matchEmail = email && p.userEmail && p.userEmail.toLowerCase().trim() === email;
+    const matchUser = userId && p.userId && p.userId === userId;
+    return matchEmail || matchUser;
+  });
+
+  // If no custom plan has been created yet for this specific user, provide the foundational clinical intake protocol template
+  if (matched.length === 0 && (email || userId)) {
+    const defaultPlan = {
+      id: 'CP-INTAKE-FOUNDATION',
+      userEmail: email,
+      userId: userId,
+      patientName: 'Valued Client',
+      title: 'Foundational Functional Nutrition & Metabolic Priming Protocol',
+      practitioner: 'Milind Kumar, Functional Nutritionist',
+      dateAssigned: new Date().toISOString().split('T')[0],
+      clinicalFocus: 'Circadian Metabolic Reset & Anti-Inflammatory Digestive Architecture',
+      dailyCalorieTarget: 'Tailored individually during intake consultation',
+      macroTargets: {
+        protein: '25-30g per meal (Anchor of satiety and glycemic stability)',
+        fiber: '30-40g daily (Gradual diversity across 30+ plant species weekly)',
+        healthyFats: 'High polyphenol EVOO, avocados, walnuts, pasture-raised lipids',
+        complexCarbs: 'Intact slow starches timed predominantly around post-movement windows',
+      },
+      mealPlan: [
+        {
+          meal: 'Digestive Awakening',
+          timing: 'Upon waking (07:00 - 08:00 AM)',
+          dishes: [
+            'Warm filtered water with fresh lemon/lime and a pinch of unrefined rock salt',
+            'Fresh ginger or cumin-coriander-fennel (CCF) light infusion',
+          ],
+          clinicalRationale: 'Stimulates cephalic and gastric digestive phases without elevating insulin.',
+        },
+        {
+          meal: 'Metabolic Anchor Breakfast',
+          timing: 'Within 90 mins of waking',
+          dishes: [
+            '2-3 pasture-raised eggs or sprouted lentil/moong cheela with sauteed leafy greens and olive oil',
+            'Small bowl of antioxidant berries (blueberries or raspberries) with roasted chia/flax seeds',
+          ],
+          clinicalRationale: 'Prioritizing protein at breakfast reduces evening craving spikes by up to 60%.',
+        },
+        {
+          meal: 'Midday Rebuilding Lunch',
+          timing: '12:30 - 01:30 PM',
+          dishes: [
+            'Plentiful rainbow vegetable plate (radishes, cucumber, steamed broccoli, carrots)',
+            'Clean protein: grilled fish, antibiotic-free chicken, or fermented tempeh/tofu with ghee',
+            'Small cup of warm bone broth or sprouted legume stew',
+          ],
+          clinicalRationale: 'Optimizes Phase I/II hepatic clearance and provides micronutrient mineral cofactors.',
+        },
+        {
+          meal: 'Circadian Restorative Dinner',
+          timing: 'Before 07:45 PM (minimum 12-hour fast overnight)',
+          dishes: [
+            'Light vegetable and lentil soup or roasted root vegetables with turmeric & black pepper',
+            'Steamed zucchini and leafy greens with cold-pressed virgin coconut oil or olive oil',
+          ],
+          clinicalRationale: 'Allows the migrating motor complex (MMC) to cleanse the small intestine during sleep.',
+        },
+      ],
+      foodsToPrioritize: [
+        'Rainbow plant diversity (aim for 30 unique whole plant species per week)',
+        'Cold-pressed single-estate extra virgin olive oil',
+        'Wild-caught small fish (sardines, wild salmon) or organic ground flaxseed',
+        'Raw fermented vegetables (sauerkraut, kimchi) for natural lactic acid bacteria',
+        'Medicinal herbs: fresh turmeric with black pepper, fresh ginger, rosemary, and oregano',
+      ],
+      foodsToAvoid: [
+        'Commercial ultra-processed foods containing high-fructose corn syrup',
+        'Industrial seed/vegetable oils (sunflower, soybean, corn, hydrogenated fats)',
+        'Artificial sweeteners and non-nutritive additives',
+        'Refined white flour bakery products and sugary beverages',
+      ],
+      supplements: [
+        {
+          name: 'Magnesium Glycinate',
+          dosage: '250-350mg',
+          timing: 'Bedtime',
+          purpose: 'Circadian relaxation, insulin signaling, and enzymatic function',
+        },
+        {
+          name: 'High-Polyphenol Green Tea or Herbal Tulsi',
+          dosage: '1 cup',
+          timing: 'Mid-morning',
+          purpose: 'Cellular autophagy and microvascular antioxidant protection',
+        },
+      ],
+      lifestyleProtocols: [
+        'Post-Meal Stride: 10-15 minute easy walking immediately following your primary meals to blunt glucose peaks.',
+        'Morning Sunlight: View 10-15 minutes of outdoor sunlight within an hour of waking to set circadian melatonin rhythms.',
+        'Hydration Rhythm: Drink pure water between meals; avoid drinking large icy drinks with meals to preserve digestive acid strength.',
+      ],
+      practitionerNotes: 'Welcome to Epion Functional Health. This baseline protocol provides the foundational dietary priming guidelines prior to your personalized consultation. During your clinical session, Milind will customize specific biomarker-targeted interventions, functional lab tests, and personalized adjustments.',
+      nextFollowUp: 'Scheduled during your upcoming consultation',
+      createdAt: new Date().toISOString(),
+    };
+    return res.json({ carePlans: [defaultPlan], isDefaultTemplate: true });
+  }
+
+  return res.json({ carePlans: matched, isDefaultTemplate: false });
+});
+
+// 7d. Create / Update Care Plan (Practitioner Admin)
+app.post('/api/careplans', (req, res) => {
+  const planData = req.body;
+  if (!planData.userEmail && !planData.userId) {
+    return res.status(400).json({ error: 'Patient email or user ID is required.' });
+  }
+
+  const allPlans = loadCarePlans();
+  const existingIndex = allPlans.findIndex(
+    (p: any) => p.id === planData.id || (p.userEmail && planData.userEmail && p.userEmail.toLowerCase().trim() === planData.userEmail.toLowerCase().trim())
+  );
+
+  const planId = planData.id || 'CP-' + Math.floor(100000 + Math.random() * 900000);
+  const updatedPlan = {
+    ...planData,
+    id: planId,
+    practitioner: 'Milind Kumar, Functional Nutritionist',
+    updatedAt: new Date().toISOString(),
+    createdAt: planData.createdAt || new Date().toISOString(),
+  };
+
+  if (existingIndex >= 0) {
+    allPlans[existingIndex] = updatedPlan;
+  } else {
+    allPlans.unshift(updatedPlan);
+  }
+
+  saveCarePlans(allPlans);
+  return res.status(201).json({ message: 'Care plan saved successfully.', carePlan: updatedPlan });
 });
 
 // 8. Science Literature Search API (PubMed / Europe PMC Live Connector)

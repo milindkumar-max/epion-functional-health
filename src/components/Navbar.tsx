@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { PageView } from '../types';
-import { Menu, X, LogIn, LogOut, User as UserIcon } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, User as UserIcon, Calendar, Utensils } from 'lucide-react';
 import { auth, signInWithGoogle, logOut, onAuthStateChanged, User } from '../lib/firebase';
 
 interface NavbarProps {
   currentPage: PageView;
   onNavigate: (page: PageView) => void;
   onOpenBooking: () => void;
+  onOpenPortal: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, onOpenBooking }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  currentPage,
+  onNavigate,
+  onOpenBooking,
+  onOpenPortal,
+}) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
@@ -24,7 +30,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, onOpenB
   const handleSignIn = async () => {
     setIsAuthLoading(true);
     try {
-      await signInWithGoogle();
+      const user = await signInWithGoogle();
+      if (user) {
+        onOpenPortal();
+      }
     } catch (err: any) {
       console.error('Firebase Auth sign-in failed:', err);
     } finally {
@@ -89,21 +98,32 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, onOpenB
           })}
         </nav>
 
-        {/* Actions: Patient Login & Primary CTA (Clean, Rebalanced, No Theme Switcher) */}
-        <div className="hidden lg:flex items-center gap-5">
-          {/* User Authentication state */}
+        {/* Actions: Patient Portal & Primary CTA (Clean, Rebalanced, No Theme Switcher) */}
+        <div className="hidden lg:flex items-center gap-4">
+          {/* User Authentication & Patient Portal State */}
           {currentUser ? (
-            <div className="flex items-center gap-2 border-r border-[#E8E2D8] dark:border-[#1E3326] pr-4">
-              <span className="text-xs text-[#5F7065] dark:text-[#9FB7A8] truncate max-w-[140px] font-mono">
-                {currentUser.displayName || currentUser.email}
-              </span>
+            <div className="flex items-center gap-3">
               <button
-                onClick={handleSignOut}
-                className="p-1.5 text-[#5F7065] hover:text-red-700 transition-colors cursor-pointer"
-                title="Sign out of patient portal"
+                onClick={onOpenPortal}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#163324] dark:text-[#FAF8F5] bg-[#EAEFE9] dark:bg-[#163324] hover:bg-[#DCE4DD] dark:hover:bg-[#1E432E] border border-[#163324]/20 rounded-xs transition-colors cursor-pointer shadow-2xs"
+                title="View your appointments, meal plan, and recommendations"
               >
-                <LogOut className="w-4 h-4" />
+                <Calendar className="w-3.5 h-3.5 text-[#163324] dark:text-[#78A88E]" />
+                <span>My Appointments & Care</span>
               </button>
+
+              <div className="flex items-center gap-2 border-l border-[#E8E2D8] dark:border-[#1E3326] pl-3">
+                <span className="text-xs text-[#5F7065] dark:text-[#9FB7A8] truncate max-w-[120px] font-mono">
+                  {currentUser.displayName || currentUser.email}
+                </span>
+                <button
+                  onClick={handleSignOut}
+                  className="p-1.5 text-[#5F7065] hover:text-red-700 transition-colors cursor-pointer"
+                  title="Sign out of patient portal"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           ) : (
             <button
@@ -129,11 +149,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, onOpenB
         <div className="flex items-center gap-3 lg:hidden">
           {currentUser ? (
             <button
-              onClick={handleSignOut}
-              className="p-2 text-xs text-[#5F7065] hover:text-red-700 cursor-pointer"
-              title="Sign out"
+              onClick={onOpenPortal}
+              className="p-2 text-xs font-medium text-[#163324] dark:text-[#FAF8F5] bg-[#EAEFE9] dark:bg-[#163324] rounded-xs flex items-center gap-1"
+              title="My Appointments"
             >
-              <LogOut className="w-4 h-4" />
+              <Calendar className="w-4 h-4" />
             </button>
           ) : (
             <button
@@ -176,7 +196,46 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, onOpenB
             ))}
           </div>
 
-          <div className="pt-4 border-t border-[#E8E2D8] dark:border-[#1E3326] space-y-3">
+          <div className="pt-4 border-t border-[#E8E2D8] dark:border-[#1E3326] space-y-2.5">
+            {currentUser ? (
+              <>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenPortal();
+                  }}
+                  className="w-full py-3 px-3 text-xs font-semibold text-[#163324] dark:text-[#FAF8F5] bg-[#EAEFE9] dark:bg-[#163324] flex items-center justify-center gap-2 rounded-xs border border-[#163324]/20"
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span>My Appointments & Care Plan</span>
+                </button>
+
+                <div className="flex items-center justify-between text-xs py-1 text-[#5F7065] dark:text-[#9FB7A8]">
+                  <span className="truncate max-w-[200px]">{currentUser.email}</span>
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="text-red-700 underline text-[11px]"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleSignIn();
+                }}
+                className="w-full py-2.5 px-3 text-xs font-medium text-[#163324] dark:text-[#FAF8F5] border border-[#E8E2D8] dark:border-[#1E3326] flex items-center justify-center gap-2 rounded-xs"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Patient Login (Google)</span>
+              </button>
+            )}
+
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

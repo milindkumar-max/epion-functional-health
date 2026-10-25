@@ -33,5 +33,10 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create, update, delete: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
     }
+    // Care plans, personalized meal plans, and practitioner recommendations
+    match /carePlans/{planId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || resource.data.userEmail == request.auth.token.email || request.auth.token.email != null);
+      allow create, update, delete: if isAuthenticated();
+    }
   }
 }

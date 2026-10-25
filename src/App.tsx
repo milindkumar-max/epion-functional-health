@@ -23,13 +23,24 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { VisualStudio } from './components/VisualStudio';
 import { LiveScienceExplorer } from './components/LiveScienceExplorer';
 import { LegalModal } from './components/LegalModal';
+import { PatientPortalModal } from './components/PatientPortalModal';
+import { auth, onAuthStateChanged, signInWithGoogle, User } from './lib/firebase';
 import { ArrowLeft } from 'lucide-react';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<PageView>('home');
   const [selectedConsultationId, setSelectedConsultationId] = useState<string | undefined>(undefined);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isPortalOpen, setIsPortalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [legalModalType, setLegalModalType] = useState<'disclaimer' | 'privacy' | 'terms' | null>(null);
+
+  React.useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleNavigate = (page: PageView) => {
     setCurrentPage(page);
@@ -50,6 +61,21 @@ function AppContent() {
     handleNavigate('booking');
   };
 
+  const handleOpenPortal = async () => {
+    if (!currentUser) {
+      try {
+        const user = await signInWithGoogle();
+        if (user) {
+          setIsPortalOpen(true);
+        }
+      } catch (e) {
+        console.error('Sign-in error:', e);
+      }
+    } else {
+      setIsPortalOpen(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[var(--canvas-bg)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-[#163324] selection:text-[#FAF8F5] relative transition-colors duration-300">
       {/* Top Bar Navigation */}
@@ -57,6 +83,7 @@ function AppContent() {
         currentPage={currentPage}
         onNavigate={handleNavigate}
         onOpenBooking={() => handleOpenBooking()}
+        onOpenPortal={handleOpenPortal}
       />
 
       {/* Main Content Area */}
@@ -302,6 +329,14 @@ function AppContent() {
       <LegalModal
         type={legalModalType}
         onClose={() => setLegalModalType(null)}
+      />
+
+      {/* Patient Portal: Appointments, Meal Plans, and Recommendations */}
+      <PatientPortalModal
+        isOpen={isPortalOpen}
+        onClose={() => setIsPortalOpen(false)}
+        onOpenBooking={() => handleOpenBooking()}
+        user={currentUser}
       />
     </div>
   );
