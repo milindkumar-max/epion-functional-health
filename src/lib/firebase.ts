@@ -45,25 +45,36 @@ const firestoreDbId = firebaseConfigData.firestoreDatabaseId || '(default)';
 export const db = getFirestore(app, firestoreDbId);
 
 // Auth Helpers
-export async function signInWithGoogle(): Promise<User> {
-  const result = await signInWithPopup(auth, googleProvider);
-  const user = result.user;
-
-  // Persist user profile document in Firestore
+export async function signInWithGoogle(): Promise<User | null> {
   try {
-    const userRef = doc(db, 'users', user.uid);
-    await setDoc(userRef, {
-      uid: user.uid,
-      displayName: user.displayName || 'Client',
-      email: user.email,
-      photoURL: user.photoURL,
-      lastLoginAt: serverTimestamp(),
-    }, { merge: true });
-  } catch (err) {
-    console.error('Error updating user document in Firestore:', err);
-  }
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
 
-  return user;
+    // Persist user profile document in Firestore
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, {
+        uid: user.uid,
+        displayName: user.displayName || 'Client',
+        email: user.email,
+        photoURL: user.photoURL,
+        lastLoginAt: serverTimestamp(),
+      }, { merge: true });
+    } catch (err) {
+      console.warn('Note: Could not update user document in Firestore:', err);
+    }
+
+    return user;
+  } catch (err: any) {
+    if (err?.code === 'auth/popup-blocked' || err?.message?.includes('popup-blocked')) {
+      console.warn('Firebase popup was blocked by browser/iframe environment. Prompting email access fallback.');
+    } else if (err?.code === 'auth/popup-closed-by-user') {
+      console.info('Google sign-in popup was closed by user.');
+    } else {
+      console.warn('Firebase sign-in notice:', err?.message || err);
+    }
+    throw err;
+  }
 }
 
 export async function logOut(): Promise<void> {

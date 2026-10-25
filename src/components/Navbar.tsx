@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PageView } from '../types';
 import { Menu, X, LogIn, LogOut, User as UserIcon, Calendar, Utensils } from 'lucide-react';
-import { auth, signInWithGoogle, logOut, onAuthStateChanged, User } from '../lib/firebase';
+import { auth, logOut, onAuthStateChanged, User } from '../lib/firebase';
 
 interface NavbarProps {
   currentPage: PageView;
@@ -18,34 +18,39 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [storedEmail, setStoredEmail] = useState<string>(() => {
+    try {
+      return localStorage.getItem('epion_patient_email') || '';
+    } catch {
+      return '';
+    }
+  });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
     });
-    return () => unsubscribe();
+    const interval = setInterval(() => {
+      try {
+        const email = localStorage.getItem('epion_patient_email') || '';
+        setStoredEmail(email);
+      } catch {}
+    }, 1500);
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
-  const handleSignIn = async () => {
-    setIsAuthLoading(true);
-    try {
-      const user = await signInWithGoogle();
-      if (user) {
-        onOpenPortal();
-      }
-    } catch (err: any) {
-      console.error('Firebase Auth sign-in failed:', err);
-    } finally {
-      setIsAuthLoading(false);
-    }
-  };
+  const effectivePatient = currentUser || (storedEmail ? { displayName: storedEmail.split('@')[0], email: storedEmail } : null);
 
   const handleSignOut = async () => {
     try {
+      localStorage.removeItem('epion_patient_email');
+      setStoredEmail('');
       await logOut();
     } catch (err: any) {
-      console.error('Firebase sign-out error:', err);
+      console.warn('Sign-out notice:', err);
     }
   };
 
@@ -101,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Actions: Patient Portal & Primary CTA (Clean, Rebalanced, No Theme Switcher) */}
         <div className="hidden lg:flex items-center gap-4">
           {/* User Authentication & Patient Portal State */}
-          {currentUser ? (
+          {effectivePatient ? (
             <div className="flex items-center gap-3">
               <button
                 onClick={onOpenPortal}
@@ -114,7 +119,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               <div className="flex items-center gap-2 border-l border-[#E8E2D8] dark:border-[#1E3326] pl-3">
                 <span className="text-xs text-[#5F7065] dark:text-[#9FB7A8] truncate max-w-[120px] font-mono">
-                  {currentUser.displayName || currentUser.email}
+                  {effectivePatient.displayName || effectivePatient.email}
                 </span>
                 <button
                   onClick={handleSignOut}
@@ -127,8 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           ) : (
             <button
-              onClick={handleSignIn}
-              disabled={isAuthLoading}
+              onClick={onOpenPortal}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#4E5B54] dark:text-[#C5D7CC] hover:text-[#163324] dark:hover:text-[#FAF8F5] transition-colors cursor-pointer"
             >
               <LogIn className="w-3.5 h-3.5" />
@@ -147,17 +151,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Mobile controls */}
         <div className="flex items-center gap-3 lg:hidden">
-          {currentUser ? (
+          {effectivePatient ? (
             <button
               onClick={onOpenPortal}
               className="p-2 text-xs font-medium text-[#163324] dark:text-[#FAF8F5] bg-[#EAEFE9] dark:bg-[#163324] rounded-xs flex items-center gap-1"
-              title="My Appointments"
+              title="My Appointments & Care"
             >
               <Calendar className="w-4 h-4" />
             </button>
           ) : (
             <button
-              onClick={handleSignIn}
+              onClick={onOpenPortal}
               className="text-xs font-medium text-[#163324] dark:text-[#FAF8F5] p-2"
             >
               Login
@@ -197,7 +201,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           <div className="pt-4 border-t border-[#E8E2D8] dark:border-[#1E3326] space-y-2.5">
-            {currentUser ? (
+            {effectivePatient ? (
               <>
                 <button
                   onClick={() => {
@@ -211,7 +215,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
 
                 <div className="flex items-center justify-between text-xs py-1 text-[#5F7065] dark:text-[#9FB7A8]">
-                  <span className="truncate max-w-[200px]">{currentUser.email}</span>
+                  <span className="truncate max-w-[200px]">{effectivePatient.email}</span>
                   <button
                     onClick={() => {
                       handleSignOut();
@@ -227,12 +231,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  handleSignIn();
+                  onOpenPortal();
                 }}
                 className="w-full py-2.5 px-3 text-xs font-medium text-[#163324] dark:text-[#FAF8F5] border border-[#E8E2D8] dark:border-[#1E3326] flex items-center justify-center gap-2 rounded-xs"
               >
                 <LogIn className="w-4 h-4" />
-                <span>Patient Login (Google)</span>
+                <span>Patient Login</span>
               </button>
             )}
 

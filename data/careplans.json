@@ -1,0 +1,109 @@
+[
+  {
+    "id": "CP-892101",
+    "userEmail": "clara.hughes@example.com",
+    "userId": "",
+    "patientName": "Clara Hughes",
+    "title": "Gut-Barrier Regeneration & Metabolic Insulin Protocol",
+    "practitioner": "Milind Kumar, Functional Nutritionist",
+    "dateAssigned": "2026-10-18",
+    "clinicalFocus": "Epithelial Permeability Stabilization & Postprandial Glycemic Damping",
+    "dailyCalorieTarget": "1,850 kcal (Nutrient-dense baseline)",
+    "macroTargets": {
+      "protein": "95g (1.4g/kg target for lean tissue & mucosal repair)",
+      "fiber": "35g+ (Prebiotic diversities: acacia, artichoke, legumes)",
+      "healthyFats": "75g (EVOO polyphenols, avocado, wild-caught omega-3)",
+      "complexCarbs": "170g (Low-glycemic slow starches, cooling cooked tubers)"
+    },
+    "mealPlan": [
+      {
+        "meal": "Morning Digestive Primer",
+        "timing": "07:30 - 08:00 AM",
+        "dishes": [
+          "300ml warm water with 1 tbsp raw unfiltered apple cider vinegar and a pinch of Celtic sea salt",
+          "Fresh ginger root & tulsi infusion (steeped 10 mins)"
+        ],
+        "clinicalRationale": "Stimulates vagal tone and gastric parietal acid secretion prior to first solid food intake."
+      },
+      {
+        "meal": "Nutrient-Dense Breakfast",
+        "timing": "08:45 - 09:15 AM",
+        "dishes": [
+          "Pastured eggs (2 eggs + 1 white) scrambled in grass-fed ghee with baby spinach and mushrooms",
+          "1/2 ripe avocado sliced with toasted pumpkin seeds and sumac",
+          "1 slice sprouted ancient grain sourdough (fermented 24h)"
+        ],
+        "clinicalRationale": "High-protein and essential choline anchor blood glucose and sustain dopamine for morning cognition."
+      },
+      {
+        "meal": "Midday Systemic Fuel",
+        "timing": "01:00 - 01:45 PM",
+        "dishes": [
+          "Grilled wild salmon or herb-marinated paneer/tempeh bowl",
+          "Rainbow cruciferous slaw: purple cabbage, grated carrots, radish with extra virgin olive oil and lemon",
+          "Small portion (1/2 cup) of cooled and reheated black rice (resistant starch)"
+        ],
+        "clinicalRationale": "Cruciferous sulforaphane supports Phase II liver biotransformation; resistant starch feeds Akkermansia muciniphila."
+      },
+      {
+        "meal": "Circadian Evening Nourishment",
+        "timing": "07:30 - 08:15 PM",
+        "dishes": [
+          "Slow-simmered bone broth or mineral-rich seaweed-shiitake broth with bok choy",
+          "Roasted sweet potato & zucchini tossed with cold-pressed mustard oil, turmeric, and cracked black pepper",
+          "Steamed cod or mung-dal khichdi prepared with cumin and hing"
+        ],
+        "clinicalRationale": "Early dinner allows minimum 12-hour circadian gut resting window; glycine in broth aids nocturnal restorative sleep."
+      }
+    ],
+    "foodsToPrioritize": [
+      "Polyphenol-dense vegetables (dark berries, pomegranate, bitter greens, radicchio)",
+      "Prebiotic roots (jerusalem artichoke, leeks, garlic, onions, chicory)",
+      "Cold-pressed single-estate extra virgin olive oil (rich in oleocanthal)",
+      "Wild small oily fish (sardines, mackerel) or organic cold-pressed flaxseed",
+      "Naturally fermented foods: live active kimchi, raw sauerkraut (1-2 tbsp daily)"
+    ],
+    "foodsToAvoid": [
+      "Refined seed oils (soybean, cottonseed, corn, industrial canola)",
+      "Ultra-processed emulsifiers (polysorbate-80, carboxymethylcellulose)",
+      "Artificial sweeteners (sucralose, acesulfame-K, aspartame)",
+      "Refined industrial wheat flour and added fructose syrups",
+      "Heavy dairy or commercial flavored yogurts with gums"
+    ],
+    "supplements": [
+      {
+        "name": "Magnesium Glycinate / Malate Chelate",
+        "dosage": "300mg elemental",
+        "timing": "45 minutes before sleep",
+        "purpose": "Neuromuscular relaxation and hepatic detox cofactor"
+      },
+      {
+        "name": "Buffered L-Glutamine & Zinc Carnosine",
+        "dosage": "5g L-Glutamine + 37.5mg Zinc Carnosine",
+        "timing": "First thing in morning on empty stomach",
+        "purpose": "Epithelial tight-junction repair and mucosal barrier defense"
+      },
+      {
+        "name": "Ultra-Pure Omega-3 EPA/DHA",
+        "dosage": "2,000mg (1,200mg EPA / 600mg DHA)",
+        "timing": "With lunch",
+        "purpose": "Resolution of systemic mucosal inflammatory cascades"
+      },
+      {
+        "name": "Spore-Based Soil Probiotic (Bacillus coagulans/subtilis)",
+        "dosage": "1 capsule (4 Billion CFU)",
+        "timing": "With largest meal of the day",
+        "purpose": "Gastric acid-resistant colonization and butyrate modulation"
+      }
+    ],
+    "lifestyleProtocols": [
+      "Post-prandial movement: 10-15 minute gentle outdoor walk immediately following lunch and dinner.",
+      "Circadian eating window: Finish all caloric intake by 8:15 PM to ensure a 12-14 hour overnight gut motility phase (Migrating Motor Complex).",
+      "Mindful mastication: Chew each solid mouthful at least 25-30 times in an unhurried, parasympathetic state.",
+      "Hydration architecture: Hydrate between meals; avoid drinking large volumes of ice-cold water during digestion."
+    ],
+    "practitionerNotes": "Reviewed recent lipid panel and comprehensive metabolic markers. Mild elevated fasting insulin (12.4 uIU/mL) and elevated hs-CRP (2.1 mg/L) suggest low-grade cellular inflammation. Primary focus over the next 4 weeks is epithelial stabilization and postprandial glucose stability. Avoid all unverified NSAIDs. Follow-up consultation scheduled to review symptomatic scores and bio-feedback markers.",
+    "nextFollowUp": "November 15, 2026",
+    "createdAt": "2026-10-18T10:00:00.000Z"
+  }
+]

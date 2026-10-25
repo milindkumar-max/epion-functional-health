@@ -9,7 +9,7 @@ import {
   Utensils,
   Pill,
   FileText,
-  User,
+  User as UserIcon,
   LogOut,
   ChevronRight,
   ShieldCheck,
@@ -17,9 +17,20 @@ import {
   ExternalLink,
   Sparkles,
   Printer,
-  Plus
+  Plus,
+  Mail,
+  AlertCircle,
+  ArrowRight
 } from 'lucide-react';
-import { auth, logOut, getUserAppointments, getUserCarePlans, StoredAppointment, StoredCarePlan } from '../lib/firebase';
+import {
+  auth,
+  logOut,
+  signInWithGoogle,
+  getUserAppointments,
+  getUserCarePlans,
+  StoredAppointment,
+  StoredCarePlan
+} from '../lib/firebase';
 
 interface PatientPortalModalProps {
   isOpen: boolean;
@@ -40,16 +51,33 @@ export const PatientPortalModal: React.FC<PatientPortalModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isDefaultTemplate, setIsDefaultTemplate] = useState<boolean>(false);
 
+  // Email verification / guest patient session state
+  const [patientEmail, setPatientEmail] = useState<string>(() => {
+    try {
+      return localStorage.getItem('epion_patient_email') || '';
+    } catch {
+      return '';
+    }
+  });
+  const [emailInput, setEmailInput] = useState<string>('');
+  const [loginNotice, setLoginNotice] = useState<string>('');
+  const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
+
+  // Effective authenticated session: either Firebase Google user or validated patient email
+  const effectiveEmail = (user?.email || patientEmail || '').toLowerCase().trim();
+  const effectiveUserId = user?.uid || '';
+  const effectiveDisplayName = user?.displayName || (patientEmail ? patientEmail.split('@')[0] : 'Patient');
+
   useEffect(() => {
-    if (!isOpen || !user) return;
+    if (!isOpen || !effectiveEmail) return;
 
     let isMounted = true;
     setIsLoading(true);
 
     const loadPortalData = async () => {
       try {
-        const userEmail = (user.email || '').toLowerCase().trim();
-        const userId = user.uid || '';
+        const userEmail = effectiveEmail;
+        const userId = effectiveUserId;
 
         // 1. Fetch appointments: attempt Firestore first, fallback/merge with server API
         let firestoreApts: StoredAppointment[] = [];
@@ -128,7 +156,7 @@ export const PatientPortalModal: React.FC<PatientPortalModalProps> = ({
           setIsLoading(false);
         }
       } catch (err) {
-        console.error('Failed to load patient portal data:', err);
+        console.warn('Patient portal data load note:', err);
         if (isMounted) setIsLoading(false);
       }
     };
@@ -138,9 +166,168 @@ export const PatientPortalModal: React.FC<PatientPortalModalProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [isOpen, user]);
+  }, [isOpen, effectiveEmail, effectiveUserId]);
 
-  if (!isOpen || !user) return null;
+  const handleGoogleSignIn = async () => {
+    setIsSigningIn(true);
+    setLoginNotice('');
+    try {
+      await signInWithGoogle();
+    } catch (err: any) {
+      if (err?.code === 'auth/popup-blocked' || err?.message?.includes('popup-blocked')) {
+        setLoginNotice('Google sign-in popup was blocked by your browser. Please enter your email below to access your consultations and care plan directly.');
+      } else if (err?.code === 'auth/popup-closed-by-user') {
+        setLoginNotice('Sign-in was cancelled. Enter your booking email below to continue.');
+      } else {
+        setLoginNotice('Could not open Google sign-in. Please use your consultation email below.');
+      }
+    } finally {
+      setIsSigningIn(false);
+    }
+  };
+
+  const handleEmailAccess = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const clean = emailInput.trim().toLowerCase();
+    if (!clean || !clean.includes('@')) {
+      setLoginNotice('Please enter a valid email address.');
+      return;
+    }
+    try {
+      localStorage.setItem('epion_patient_email', clean);
+    } catch {}
+    setPatientEmail(clean);
+    setLoginNotice('');
+  };
+
+  const handlePortalSignOut = async () => {
+    try {
+      localStorage.removeItem('epion_patient_email');
+    } catch {}
+    setPatientEmail('');
+    try {
+      await logOut();
+    } catch {}
+  };
+
+  if (!isOpen) return null;
+
+  // Unauthenticated view: Clean, frictionless login & email lookup
+  if (!effectiveEmail) {
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+        <div className="bg-[#FAF8F5] dark:bg-[#0C1811] border border-[#E8E2D8] dark:border-[#1E3326] w-full max-w-lg rounded-xs shadow-2xl overflow-hidden p-6 sm:p-8 relative">
+          <button
+            onClick={onClose}
+            className="absolute top-5 right-5 p-1.5 text-[#5F7065] hover:text-[#163324] dark:text-[#9FB7A8] dark:hover:text-[#FAF8F5] transition-colors cursor-pointer rounded-xs"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <div className="text-center mb-6">
+            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#EAEFE9] dark:bg-[#163324] text-[#163324] dark:text-[#86C19D] flex items-center justify-center border border-[#163324]/10 shadow-2xs">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <h2 className="font-serif text-2xl font-normal text-[#163324] dark:text-[#FAF8F5]">
+              Patient Care Portal
+            </h2>
+            <p className="text-xs text-[#5F7065] dark:text-[#9FB7A8] mt-1.5 max-w-sm mx-auto leading-relaxed">
+              Access your personalized whole-food meal plans, targeted nutraceutical recommendations, and consultation schedules.
+            </p>
+          </div>
+
+          {loginNotice && (
+            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xs text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5 mb-5">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-700 dark:text-amber-400" />
+              <span className="leading-relaxed">{loginNotice}</span>
+            </div>
+          )}
+
+          {/* Option 1: Continue with Google */}
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={isSigningIn}
+            className="w-full py-3 px-4 border border-[#163324]/20 bg-[#FAF8F5] dark:bg-[#163324]/40 hover:bg-[#EAEFE9] dark:hover:bg-[#163324] text-[#163324] dark:text-[#FAF8F5] text-xs font-semibold rounded-xs transition-colors cursor-pointer flex items-center justify-center gap-2.5 shadow-2xs disabled:opacity-50"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24">
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+              />
+            </svg>
+            <span>{isSigningIn ? 'Connecting...' : 'Continue with Google'}</span>
+          </button>
+
+          <div className="relative my-6 text-center">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#E8E2D8] dark:border-[#1E3326]" />
+            </div>
+            <span className="relative bg-[#FAF8F5] dark:bg-[#0C1811] px-3 text-[11px] uppercase tracking-wider text-[#5F7065] font-mono">
+              Or verify with booking email
+            </span>
+          </div>
+
+          {/* Option 2: Direct Email Verification */}
+          <form onSubmit={handleEmailAccess} className="space-y-3">
+            <div>
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-[#4E5B54] dark:text-[#C5D7CC] mb-1.5">
+                Consultation Email Address
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-[#5F7065] absolute left-3 top-3" />
+                <input
+                  type="email"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="e.g. sarah.jenkins@example.com"
+                  className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#FFFFFF] dark:bg-[#08120C] border border-[#E8E2D8] dark:border-[#1E3326] rounded-xs text-[#163324] dark:text-[#FAF8F5] focus:outline-none focus:border-[#163324] dark:focus:border-[#86C19D]"
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-2.5 px-4 bg-[#163324] hover:bg-[#204532] text-[#FAF8F5] text-xs font-semibold uppercase tracking-wider rounded-xs transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-xs"
+            >
+              <span>Access My Care Portal</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </form>
+
+          {/* Demo shortcut helper */}
+          <div className="mt-4 pt-4 border-t border-[#E8E2D8]/60 dark:border-[#1E3326]/60 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setEmailInput('sarah.jenkins@example.com');
+                setPatientEmail('sarah.jenkins@example.com');
+                try {
+                  localStorage.setItem('epion_patient_email', 'sarah.jenkins@example.com');
+                } catch {}
+              }}
+              className="text-[11px] text-[#2A4E38] dark:text-[#86C19D] hover:underline cursor-pointer font-medium"
+            >
+              Preview sample patient record (sarah.jenkins@example.com)
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const currentPlan = carePlans[0] || null;
 
@@ -204,12 +391,12 @@ export const PatientPortalModal: React.FC<PatientPortalModalProps> = ({
         <div className="px-6 py-5 border-b border-[#E8E2D8] dark:border-[#1E3326] bg-[#F4EFEA] dark:bg-[#08120C] flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-full bg-[#163324] text-[#FAF8F5] flex items-center justify-center font-serif text-lg font-semibold border border-[#E8E2D8]/40 shadow-xs">
-              {user.displayName ? user.displayName.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'P')}
+              {(effectiveDisplayName.charAt(0) || 'P').toUpperCase()}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-serif font-medium text-[#163324] dark:text-[#FAF8F5]">
-                  {user.displayName || 'Client Portal'}
+                  {effectiveDisplayName || 'Patient Portal'}
                 </h2>
                 <span className="inline-flex items-center gap-1 text-[10px] tracking-wider uppercase font-semibold px-2 py-0.5 rounded-full bg-[#EAEFE9] dark:bg-[#163324] text-[#163324] dark:text-[#C5D7CC] border border-[#163324]/10">
                   <ShieldCheck className="w-3 h-3 text-[#163324] dark:text-[#78A88E]" />
@@ -217,7 +404,7 @@ export const PatientPortalModal: React.FC<PatientPortalModalProps> = ({
                 </span>
               </div>
               <p className="text-xs text-[#5F7065] dark:text-[#9FB7A8] font-mono mt-0.5">
-                {user.email}
+                {effectiveEmail}
               </p>
             </div>
           </div>
@@ -710,7 +897,7 @@ export const PatientPortalModal: React.FC<PatientPortalModalProps> = ({
 
           <button
             onClick={async () => {
-              await logOut();
+              await handlePortalSignOut();
               onClose();
             }}
             className="inline-flex items-center gap-1.5 text-xs text-[#5F7065] hover:text-red-700 transition-colors cursor-pointer"

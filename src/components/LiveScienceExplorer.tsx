@@ -83,7 +83,7 @@ export const LiveScienceExplorer: React.FC = () => {
         setIsLoadingCompound(false);
       })
       .catch((err) => {
-        console.error('PubChem fetch error:', err);
+        console.warn('PubChem fetch warning:', err);
         setCompoundError('Could not reach PubChem database.');
         setIsLoadingCompound(false);
       });

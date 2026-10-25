@@ -24,7 +24,7 @@ import { VisualStudio } from './components/VisualStudio';
 import { LiveScienceExplorer } from './components/LiveScienceExplorer';
 import { LegalModal } from './components/LegalModal';
 import { PatientPortalModal } from './components/PatientPortalModal';
-import { auth, onAuthStateChanged, signInWithGoogle, User } from './lib/firebase';
+import { auth, onAuthStateChanged, User } from './lib/firebase';
 import { ArrowLeft } from 'lucide-react';
 
 function AppContent() {
@@ -61,19 +61,8 @@ function AppContent() {
     handleNavigate('booking');
   };
 
-  const handleOpenPortal = async () => {
-    if (!currentUser) {
-      try {
-        const user = await signInWithGoogle();
-        if (user) {
-          setIsPortalOpen(true);
-        }
-      } catch (e) {
-        console.error('Sign-in error:', e);
-      }
-    } else {
-      setIsPortalOpen(true);
-    }
+  const handleOpenPortal = () => {
+    setIsPortalOpen(true);
   };
 
   return (
