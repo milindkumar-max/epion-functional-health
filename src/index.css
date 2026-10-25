@@ -1,0 +1,341 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Modern Dynamic Font Pairing Stacks */
+    --font-heading: 'Newsreader', Georgia, serif;
+    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    /* Default Ivory theme (Art-directed editorial paper & warm daylight) */
+    --canvas-bg: #FAF8F5;
+    --surface-bg: #FFFFFF;
+    --surface-secondary: #F4F1EA;
+    --text-primary: #163324;
+    --text-secondary: #38483F;
+    --text-muted: #66786F;
+    --border-color: #E2DDD5;
+    --border-subtle: #EFEBE4;
+    --accent-emerald: #163324;
+    --accent-sage: #86C19D;
+    --accent-contrast: #FAF8F5;
+  }
+
+  /* Font Style Mode 1: Editorial Serif (Newsreader + Plus Jakarta Sans) */
+  [data-font="editorial-serif"] {
+    --font-heading: 'Newsreader', Georgia, serif;
+    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Font Style Mode 2: Modern Tech-Bio Sans (Instrument Sans + Inter) */
+  [data-font="modern-sans"] {
+    --font-heading: 'Instrument Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Font Style Mode 3: Confident Display Serif (DM Serif Display + Plus Jakarta Sans) */
+  [data-font="display-serif"] {
+    --font-heading: 'DM Serif Display', Georgia, serif;
+    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Theme 1: Muted Sage (Botanical clinical calm) */
+  [data-theme="sage"] {
+    --canvas-bg: #F2F5F2;
+    --surface-bg: #FFFFFF;
+    --surface-secondary: #E7EEE8;
+    --text-primary: #12301F;
+    --text-secondary: #35473B;
+    --text-muted: #607567;
+    --border-color: #D7E1D8;
+    --border-subtle: #E5ECE5;
+    --accent-emerald: #163B26;
+    --accent-sage: #7EB894;
+    --accent-contrast: #FAF8F5;
+  }
+
+  /* Theme 2: Muted Sand (Warm travertine / linen studio) */
+  [data-theme="sand"] {
+    --canvas-bg: #F5F2EC;
+    --surface-bg: #FFFFFF;
+    --surface-secondary: #EBE5DA;
+    --text-primary: #212922;
+    --text-secondary: #45473F;
+    --text-muted: #737469;
+    --border-color: #DDD5C7;
+    --border-subtle: #E8E2D6;
+    --accent-emerald: #1B3926;
+    --accent-sage: #8BB297;
+    --accent-contrast: #FAF8F5;
+  }
+
+  /* Theme 3: Chalk Minimal (Crisp high-contrast modern UI) */
+  [data-theme="chalk"] {
+    --canvas-bg: #FBFBFB;
+    --surface-bg: #FFFFFF;
+    --surface-secondary: #F3F3F3;
+    --text-primary: #0F1D16;
+    --text-secondary: #313D36;
+    --text-muted: #68756E;
+    --border-color: #E2E2E2;
+    --border-subtle: #EFEFEF;
+    --accent-emerald: #0F1D16;
+    --accent-sage: #538F6E;
+    --accent-contrast: #FFFFFF;
+  }
+
+  /* Theme 4: Deep Forest (Nocturnal emerald laboratory) */
+  [data-theme="forest"] {
+    --canvas-bg: #0C1811;
+    --surface-bg: #13241A;
+    --surface-secondary: #193123;
+    --text-primary: #F7FAF8;
+    --text-secondary: #C8DDD0;
+    --text-muted: #8AA495;
+    --border-color: #223F2E;
+    --border-subtle: #193325;
+    --accent-emerald: #86C19D;
+    --accent-sage: #9EE2BA;
+    --accent-contrast: #0C1811;
+  }
+
+  /* Theme 5: Obsidian Modern (Sleek dark tech-bio aesthetic) */
+  [data-theme="obsidian"] {
+    --canvas-bg: #0A0D0B;
+    --surface-bg: #111713;
+    --surface-secondary: #17211B;
+    --text-primary: #EDEDED;
+    --text-secondary: #B9C7BF;
+    --text-muted: #798B82;
+    --border-color: #1E2B23;
+    --border-subtle: #16201A;
+    --accent-emerald: #75BE93;
+    --accent-sage: #A4E2BD;
+    --accent-contrast: #0A0D0B;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--text-primary);
+    background-color: var(--canvas-bg);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+  }
+
+  h1, h2, h3, .font-serif, .font-heading {
+    font-family: var(--font-heading);
+  }
+}
+
+.font-serif, .font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-sans, .font-body {
+  font-family: var(--font-body);
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Restrained, deliberate image reveal */
+.image-reveal {
+  opacity: 0;
+  animation: gentleFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes gentleFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth accordion & interactive transitions */
+.accordion-content {
+  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+/* Animated biochemical kinetic pulse */
+@keyframes signalPulse {
+  0%, 100% {
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dashoffset: 24;
+  }
+}
+
+.kinetic-pathway-pulse {
+  stroke-dasharray: 6 6;
+  animation: signalPulse 4s linear infinite;
+}
+
+/* Quirky yet highly professional CTA button typography */
+.font-quirky-cta {
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: 0.05em;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Natural Food Particle Keyframes: Floating, Falling, Popping */
+@keyframes foodFallDrift {
+  0% {
+    transform: translateY(-80px) rotate(0deg) scale(0.9);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.85;
+  }
+  85% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(850px) rotate(180deg) scale(1.05);
+    opacity: 0;
+  }
+}
+
+@keyframes foodPopFloat {
+  0% {
+    transform: scale(0.65) translateY(12px) rotate(-6deg);
+    opacity: 0;
+  }
+  30% {
+    transform: scale(1.08) translateY(-6px) rotate(2deg);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1) translateY(-10px) rotate(0deg);
+    opacity: 0.9;
+  }
+  75% {
+    transform: scale(1.02) translateY(6px) rotate(-3deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1) translateY(-10px) rotate(0deg);
+    opacity: 0.9;
+  }
+}
+
+@keyframes foodGentleHover {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(4deg);
+  }
+}
+
+.food-fall-particle {
+  position: absolute;
+  pointer-events: none;
+  animation: foodFallDrift linear infinite;
+  will-change: transform, opacity;
+}
+
+.food-pop-float {
+  position: absolute;
+  pointer-events: none;
+  animation: foodPopFloat 9s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.food-hover-drift {
+  position: absolute;
+  pointer-events: none;
+  animation: foodGentleHover 7s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Photorealistic Hero Food Floating & Gentle Falling Keyframes */
+@keyframes heroFloatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-16px) rotate(3deg);
+  }
+}
+
+@keyframes heroFloatGentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(14px) rotate(-2.5deg);
+  }
+}
+
+@keyframes heroDriftReverse {
+  0%, 100% {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+  50% {
+    transform: translate(-8px, -12px) rotate(-4deg);
+  }
+}
+
+@keyframes heroFallSway {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(18px) rotate(4deg);
+  }
+}
+
+@keyframes heroDriftSlow {
+  0%, 100% {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+  50% {
+    transform: translate(10px, -14px) rotate(2deg);
+  }
+}
+
+.animate-hero-float-slow {
+  animation: heroFloatSlow 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-hero-float-gentle {
+  animation: heroFloatGentle 11s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-hero-drift-reverse {
+  animation: heroDriftReverse 13s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-hero-fall-sway {
+  animation: heroFallSway 10s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-hero-drift-slow {
+  animation: heroDriftSlow 12s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-float-slow,
+  .animate-hero-float-gentle,
+  .animate-hero-drift-reverse,
+  .animate-hero-fall-sway,
+  .animate-hero-drift-slow,
+  .food-fall-particle,
+  .food-pop-float,
+  .food-hover-drift {
+    animation: none !important;
+    transform: none !important;
+  }
+}

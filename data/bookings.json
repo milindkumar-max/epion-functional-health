@@ -1,0 +1,108 @@
+[
+  {
+    "id": "EPN-280749",
+    "consultationId": "initial-systems-intake",
+    "consultationName": "Initial Functional Nutrition Consultation",
+    "date": "2026-11-04",
+    "time": "11:00",
+    "durationMinutes": 75,
+    "priceINR": 2000,
+    "priceUSD": 25,
+    "consultationMode": "In-Clinic (Bellandur, Bengaluru)",
+    "fullName": "Test Client Verification",
+    "email": "milindkumar@epionfunctionalhealth.com",
+    "phone": "+91 98450 12345",
+    "reason": "Comprehensive intake verification test",
+    "status": "confirmed",
+    "createdAt": "2026-10-25T10:19:38.114Z",
+    "emailDelivery": {
+      "status": "sent",
+      "message": "Confirmation email dispatched to milindkumar@epionfunctionalhealth.com and alert sent to milindkumar@epionfunctionalhealth.com",
+      "resendId": "01a17292-afc4-7c15-8e23-a83a7f49ae74"
+    }
+  },
+  {
+    "id": "EPN-569697",
+    "consultationId": "initial-systems-intake",
+    "consultationName": "Initial Functional Nutrition Consultation",
+    "date": "2026-10-30",
+    "time": "11:00",
+    "durationMinutes": 75,
+    "priceINR": 2000,
+    "priceUSD": 25,
+    "fullName": "Milind Kumar",
+    "email": "milindkumar@epionfunctionalhealth.com",
+    "phone": "+91 98450 12345",
+    "reason": "Systems biology clinical intake verification",
+    "status": "confirmed",
+    "createdAt": "2026-10-25T08:41:11.189Z",
+    "emailDelivery": {
+      "status": "sent",
+      "message": "Confirmation email dispatched to milindkumar@epionfunctionalhealth.com and alert sent to milindkumar@epionfunctionalhealth.com",
+      "resendId": "01a17238-8de4-7e8d-a5df-aced9f3df8d6"
+    }
+  },
+  {
+    "id": "EPN-904233",
+    "consultationId": "focused-nutrition-consultation",
+    "consultationName": "Focused Nutrition Consultation",
+    "date": "2026-10-29",
+    "time": "09:30",
+    "durationMinutes": 45,
+    "priceINR": 1500,
+    "priceUSD": 25,
+    "fullName": "Aarav Patel",
+    "email": "aarav.patel@example.com",
+    "phone": "+91 98765 12345",
+    "reason": "Blood sugar regulation and postprandial fatigue",
+    "status": "confirmed",
+    "createdAt": "2026-10-24T17:26:12.233Z",
+    "emailDelivery": {
+      "status": "unconfigured",
+      "message": "Email service requires RESEND_API_KEY in environment secrets to send live emails."
+    }
+  },
+  {
+    "id": "EPN-447346",
+    "consultationId": "initial-systems-intake",
+    "consultationName": "Comprehensive Systems Biology Intake",
+    "date": "2026-10-28",
+    "time": "09:00",
+    "durationMinutes": 75,
+    "priceUSD": 295,
+    "fullName": "Priya Sharma",
+    "email": "priya.sharma@example.com",
+    "phone": "+91 98450 12345",
+    "reason": "Persistent fatigue and post-meal energy drops",
+    "status": "confirmed",
+    "createdAt": "2026-10-24T16:38:34.348Z"
+  },
+  {
+    "id": "EPN-849201",
+    "consultationId": "initial-systems-intake",
+    "consultationName": "Comprehensive Systems Biology Intake",
+    "date": "2026-10-15",
+    "time": "10:00",
+    "durationMinutes": 75,
+    "fullName": "Clara Hughes",
+    "email": "clara.hughes@example.com",
+    "phone": "+1 (415) 890-1204",
+    "reason": "Investigating persistent post-meal bloating and afternoon energy crashes for 12 months.",
+    "status": "confirmed",
+    "createdAt": "2026-10-08T14:22:00Z"
+  },
+  {
+    "id": "EPN-618492",
+    "consultationId": "targeted-metabolic-review",
+    "consultationName": "Targeted Metabolic & Glycemic Review",
+    "date": "2026-10-16",
+    "time": "14:00",
+    "durationMinutes": 45,
+    "fullName": "Marcus Vance",
+    "email": "marcus.vance@example.com",
+    "phone": "+1 (510) 332-9011",
+    "reason": "Reviewing continuous glucose monitor (CGM) readings and morning fasting insulin.",
+    "status": "confirmed",
+    "createdAt": "2026-10-09T09:15:00Z"
+  }
+]

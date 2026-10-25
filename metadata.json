@@ -1,0 +1,6 @@
+{
+  "name": "Epion Functional Health",
+  "description": "Evidence-informed functional nutrition and personalized metabolic health platform exploring systems biology, gut microbiome, and cellular biochemistry.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

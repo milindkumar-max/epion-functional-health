@@ -1,0 +1,19 @@
+{
+  "businessHours": {
+    "start": "09:00",
+    "end": "17:00",
+    "slotIntervalMinutes": 30
+  },
+  "workingDays": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "blockedDates": [
+    "2026-12-25",
+    "2026-01-01"
+  ],
+  "bufferMinutes": 15
+}
